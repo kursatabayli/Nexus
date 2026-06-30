@@ -1,0 +1,61 @@
+﻿<MudPaper Elevation="0" Class="d-flex flex-column gap-4 pa-6 rounded-xl relative overflow-hidden"
+          Style="transition: border-color 0.3s">
+
+    <MudStack Row="true" AlignItems="AlignItems.Start" Justify="Justify.SpaceBetween">
+
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+            <MudAvatar Variant="Variant.Filled" Color="Color.Primary" Rounded="true">
+                <MudIcon Icon="@Icons.Material.Filled.ShowChart" />
+            </MudAvatar>
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6" Class="fw-bold">@Lang.FanCurves</MudText>
+            </MudStack>
+        </MudStack>
+
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
+
+            <FanModeSelector CurrentMode="@(CurrentStats?.CurrentMode ?? FanMode.Auto)" CurrentModeChanged="HandleModeChange"
+                             IsManualModeDisabled="@(CurrentStats?.CpuTemp == -1)" />
+        </MudStack>
+    </MudStack>
+
+    <MudDivider />
+
+    <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pt-6 pb-8"
+             Style="transition: all 0.3s ease;">
+
+        <MudTabPanel Text="@Lang.CpuFan" Icon="@Icons.Material.Filled.Memory">
+            <CurveEditor Title="@Lang.CpuFan" Color="#f43f5e" @bind-Points="@_draftCpuCurve"
+                         @bind-Points:after="OnCurveEdited" CurrentTemp="@CurrentCpuTemp" OnAutoSaveRequested="HandleCpuAutoSave" />
+        </MudTabPanel>
+
+        <MudTabPanel Text="@Lang.GpuFan" Icon="@Icons.Material.Filled.VideogameAsset">
+            <CurveEditor Title="@Lang.GpuFan" Color="#00e5ff" @bind-Points="@_draftGpuCurve"
+                         @bind-Points:after="OnCurveEdited" CurrentTemp="@CurrentGpuTemp" OnAutoSaveRequested="HandleGpuAutoSave" />
+        </MudTabPanel>
+
+    </MudTabs>
+
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween"
+              Class="mt-2 pt-4 border-t mud-border-lines-default">
+
+        <MudButton OnClick="RestoreDefaults" StartIcon="@Icons.Material.Filled.RestartAlt" Variant="Variant.Text"
+                   Color="Color.Default" Size="Size.Small">
+            @Lang.ResetToDefault
+        </MudButton>
+
+        <MudStack Row="true" Spacing="2" Class="@(_isDirty ? "visible" : "invisible")">
+
+            <MudButton OnClick="DiscardChanges" StartIcon="@Icons.Material.Filled.Undo" Variant="Variant.Outlined"
+                       Color="Color.Error" Size="Size.Small">
+                @Lang.Discard
+            </MudButton>
+
+            <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Color="Color.Success"
+                       StartIcon="@Icons.Material.Filled.Save" Size="Size.Small" Class="px-6 rounded-lg shadow-md">
+                @Lang.Apply
+            </MudButton>
+        </MudStack>
+
+    </MudStack>
+</MudPaper>

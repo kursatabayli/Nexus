@@ -1,0 +1,72 @@
+html,
+body {
+    user-select: none;
+    overflow: hidden;
+    height: 100vh;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+}
+
+.sensor-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.sensor-glow {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    opacity: 0.1;
+    filter: blur(40px);
+    border-radius: 50%;
+}
+
+.home-tab-header {
+    width: fit-content;
+}
+
+.mux-panel-container {
+    min-height: 85vh;
+    width: 100%;
+    padding: 2rem 1rem;
+}
+
+.mux-content-wrapper {
+    max-width: 1100px;
+    width: 100%;
+}
+
+.mux-card {
+    min-height: 280px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.mux-card-readonly {
+    cursor: default;
+    transform: scale(1.02);
+}
+
+.mux-card-clickable {
+    cursor: pointer;
+}
+
+    .mux-card-clickable:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+.mux-card-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.mux-icon-wrapper {
+    height: 64px;
+    width: 64px;
+}
+
+.mux-custom-icon {
+    font-size: 3rem !important;
+}

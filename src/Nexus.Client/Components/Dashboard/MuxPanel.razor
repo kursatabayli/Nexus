@@ -1,0 +1,39 @@
+﻿<MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+    <MudStack Spacing="8" Class="mux-content-wrapper">
+
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="rounded-lg shadow" Icon="@Icons.Material.Filled.WarningAmber">
+            @Lang.MuxWarningMessage
+        </MudAlert>
+
+        <MudGrid Justify="Justify.Center" Spacing="4">
+            @foreach (var mode in SupportedModes)
+            {
+                <MudItem xs="12" sm="6" md="3" Class="d-flex">
+                    <MudCard Outlined="!IsCurrentMode(mode)"
+                             Elevation="@(IsCurrentMode(mode) ? 6 : 1)"
+                             Class="@GetCardClasses(mode)"
+                             @onclick="@(() => HandleCardClickAsync(mode))">
+
+                        <MudCardContent Class="d-flex flex-column align-center text-center pa-6 flex-grow-1">
+
+                            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mux-icon-wrapper mb-2">
+                                <MudIcon Icon="@GetModeIcon(mode)"
+                                         Color="@(IsCurrentMode(mode) ? Color.Primary : Color.Default)"
+                                         Class="mux-custom-icon" />
+                            </MudStack>
+
+                            <MudText Typo="Typo.h6" Color="@(IsCurrentMode(mode) ? Color.Primary : Color.Default)" Class="mb-3 font-weight-bold">
+                                @GetModeName(mode)
+                            </MudText>
+
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary flex-grow-1 d-flex align-center">
+                                @GetModeDescription(mode)
+                            </MudText>
+
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudStack>
+</MudStack>

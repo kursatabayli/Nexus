@@ -1,0 +1,63 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@_theme" IsDarkMode="true" />
+<MudPopoverProvider />
+<MudSnackbarProvider />
+<MudDialogProvider />
+
+<MudLayout>
+    <MudMainContent Class="pa-8">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private MudTheme _theme = new();
+    protected override void OnInitialized()
+    {
+        _theme = new()
+        {
+            PaletteDark = _darkPalette,
+            LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" }
+        };
+    }
+
+    private readonly PaletteDark _darkPalette = new()
+    {
+        Primary = "#3B82F6",
+        Secondary = "#8B5CF6",
+
+        Background = "#11111A",
+        Surface = "#1C1C26",
+        AppbarBackground = "#11111A",
+
+        AppbarText = "#F1F5F9",
+        TextPrimary = "#F1F5F9",
+        TextSecondary = "#94A3B8",
+        TextDisabled = "#475569",
+
+        DrawerBackground = "#16161F",
+        DrawerText = "#F1F5F9",
+        DrawerIcon = "#94A3B8",
+
+        ActionDefault = "#94A3B8",
+        ActionDisabled = "#334155",
+        ActionDisabledBackground = "#191924",
+        LinesDefault = "#2D2D3A",
+        TableLines = "#2D2D3A",
+        Divider = "#2D2D3A",
+
+        OverlayLight = "rgba(59, 130, 246, 0.05)",
+
+        Info = "#0EA5E9",
+        Success = "#10B981",
+        Warning = "#F59E0B",
+        Error = "#EF4444",
+
+        Black = "#050505",
+        White = "#FFFFFF"
+    };
+
+}

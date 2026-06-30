@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Nexus.Client/Nexus.Client.csproj" Id="d19a9654-41d6-4512-932c-3191352ea8df" />
+    <Project Path="src/Nexus.Service/Nexus.Service.csproj" Id="298e2efe-34dd-4a30-a4fe-901523a700a1" />
+    <Project Path="src/Nexus.Shared/Nexus.Shared.csproj" Id="6a78cee1-35be-4f28-b053-27531b8ac041" />
+  </Folder>
+</Solution>

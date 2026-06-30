@@ -1,0 +1,76 @@
+<MudGrid Spacing="6" Justify="Justify.Center" Class="mt-2">
+    @foreach (var item in _sensors)
+    {
+        <MudItem xs="12" sm="6">
+            <MudPaper Elevation="2" Outlined="true"
+                      Class="pa-6 rounded-xl d-flex flex-column align-center relative overflow-hidden sensor-card">
+
+                <MudElement Class="sensor-glow" Style="@($"background: {item.DisplayColor};")" />
+
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-6">
+                    <MudAvatar Variant="Variant.Filled" Color="Color.Surface" Rounded="true" Elevation="1">
+                        <MudIcon Icon="@item.Icon" Style="@($"color: {item.DisplayColor};")" />
+                    </MudAvatar>
+                    <MudText Typo="Typo.h5" Class="fw-bold">@item.Label</MudText>
+                </MudStack>
+
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Spacing="4" Class="w-100">
+                    
+                    <MudStack Row="true" AlignItems="AlignItems.Baseline" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Filled.DeviceThermostat" Color="Color.Secondary" Size="Size.Small" />
+                        <MudText Typo="Typo.h3" Class="fw-bold lh-1" Style="@($"color: {item.DisplayColor};")">
+                            @(item.Temp == -1 ? "??" : item.Temp.ToString())
+                        </MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Secondary" Class="lh-1">°C</MudText>
+                    </MudStack>
+
+                    <MudDivider Vertical="true" FlexItem="true" Class="mx-2" />
+
+                    <MudStack Row="true" AlignItems="AlignItems.Baseline" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Filled.Air" Color="Color.Secondary" Size="Size.Small" />
+                        <MudText Typo="Typo.h4" Class="fw-bold">
+                            @item.Rpm
+                        </MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="font-monospace">
+                            RPM
+                        </MudText>
+                    </MudStack>
+
+                </MudStack>
+
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@if (CurrentStats != null && CurrentStats.Value.CpuTemp == -1)
+{
+    <MudAlert Severity="Severity.Warning" Class="mt-8" ContentAlignment="HorizontalAlignment.Center">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+            <MudText>CPU Sıcaklığı okunamıyor. Core Temp kapalı veya yüklü değil.</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small" 
+                       OnClick="RetryCoreTempAsync" Disabled="@_isRetrying">
+                @if (_isRetrying)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                    <MudText Class="ms-2">Aranıyor...</MudText>
+                }
+                else
+                {
+                    <MudText>Yeniden Dene</MudText>
+                }
+            </MudButton>
+        </MudStack>
+    </MudAlert>
+}
+
+@* @if (CurrentStats != null)
+{
+    <MudStack AlignItems="AlignItems.Center" Class="mt-8">
+        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large"
+                 Icon="@Icons.Material.Filled.Tune">
+            Aktif Profil: 
+            <MudText Inline="true" Class="fw-bold ms-1">@CurrentStats.Value.CurrentMode.ToString().ToUpper()</MudText>
+        </MudChip>
+    </MudStack>
+} *@

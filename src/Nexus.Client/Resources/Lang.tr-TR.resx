@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ConnectingToBackgroundService" xml:space="preserve">
+    <value>Arka Plan Servisine Bağlanılıyor, Lütfen Bekleyin...</value>
+  </data>
+  <data name="FanControl" xml:space="preserve">
+    <value>Fan Kontrolü</value>
+  </data>
+  <data name="MuxSwitch" xml:space="preserve">
+    <value>Mux Switch</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Tekrar Dene</value>
+  </data>
+  <data name="ServiceNotFoundWarning" xml:space="preserve">
+    <value>Servis bulunamadı! Lütfen Nexus Background Service'in arka planda çalıştığından emin olun.</value>
+  </data>
+  <data name="SystemStats" xml:space="preserve">
+    <value>Sistem İstatistikleri</value>
+  </data>
+  <data name="Auto" xml:space="preserve">
+    <value>Otomatik</value>
+  </data>
+  <data name="Manual" xml:space="preserve">
+    <value>Manuel</value>
+  </data>
+  <data name="Max" xml:space="preserve">
+    <value>Maksimum</value>
+  </data>
+  <data name="ManualModeDisabledTooltip" xml:space="preserve">
+    <value>Sıcaklık sensörü algılanamadığı için manuel mod kapalı.</value>
+  </data>
+  <data name="FanCurves" xml:space="preserve">
+    <value>Fan Eğrileri</value>
+  </data>
+  <data name="CpuFan" xml:space="preserve">
+    <value>CPU Fanı</value>
+  </data>
+  <data name="GpuFan" xml:space="preserve">
+    <value>GPU Fanı</value>
+  </data>
+  <data name="ResetToDefault" xml:space="preserve">
+    <value>Varsayılana Sıfırla</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Vazgeç</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Uygula</value>
+  </data>
+  <data name="FailedToFetchFanSettings" xml:space="preserve">
+    <value>Fan ayarları alınamadı!</value>
+  </data>
+  <data name="MuxWarningMessage" xml:space="preserve">
+    <value>MUX Switch ayarlarının değiştirilmesi, donanım seviyesinde değişiklik yaptığı için sistemin yeniden başlatılmasını veya oturumun kapatılmasını gerektirebilir.</value>
+  </data>
+  <data name="MuxModeQueued" xml:space="preserve">
+    <value>{0} modu başarıyla kuyruğa alındı. Değişikliklerin devreye girmesi için sisteminizi yeniden başlatmanız gerekebilir.</value>
+  </data>
+  <data name="MuxChangeRejected" xml:space="preserve">
+    <value>Mod değiştirme isteği servis tarafından reddedildi veya donanımınız bu modu şu an uygulayamıyor.</value>
+  </data>
+  <data name="BackgroundServiceError" xml:space="preserve">
+    <value>Arka plan servisinde işlem sırasında hata oluştu.</value>
+  </data>
+  <data name="ConnectionLostError" xml:space="preserve">
+    <value>Arka plan servisiyle bağlantı koptu. Lütfen servisin çalıştığından emin olun.</value>
+  </data>
+  <data name="IoError" xml:space="preserve">
+    <value>Servisle iletişim kurulurken bir G/Ç hatası meydana geldi.</value>
+  </data>
+  <data name="MuxDescHybrid" xml:space="preserve">
+    <value>Dahili grafik birimi tamamen devre dışı bırakılır. Kare iletim gecikmesini en aza indirerek oyunlarda maksimum performans sağlar, ancak pil tüketimini artırır.</value>
+  </data>
+  <data name="MuxDescDiscrete" xml:space="preserve">
+    <value>Dahili grafik birimi tamamen devre dışı bırakılır. Kare iletim gecikmesini en aza indirerek oyunlarda maksimum performans sağlar, ancak pil tüketimini artırır.</value>
+  </data>
+  <data name="MuxDescOptimus" xml:space="preserve">
+    <value>NVIDIA'nın dinamik ekran kartı geçiş teknolojisidir. Sistem yüküne göre harici kartı uyku moduna alabilir veya uyandırabilir.</value>
+  </data>
+  <data name="MuxDescUMA" xml:space="preserve">
+    <value>Harici ekran kartı tamamen kapatılır. Maksimum pil ömrü ve minimum ısınma için idealdir.</value>
+  </data>
+  <data name="MuxDescUndefined" xml:space="preserve">
+    <value>Tanımlanmamış grafik modu.</value>
+  </data>
+  <data name="MuxNameHybrid" xml:space="preserve">
+    <value>Hibrit</value>
+  </data>
+  <data name="MuxNameDiscrete" xml:space="preserve">
+    <value>Ayrık</value>
+  </data>
+  <data name="MuxNameOptimus" xml:space="preserve">
+    <value>Optimus</value>
+  </data>
+  <data name="MuxNameUMA" xml:space="preserve">
+    <value>UMA</value>
+  </data>
+  <data name="PointSettingsTitleFormat" xml:space="preserve">
+    <value>{0} Nokta Ayarları</value>
+  </data>
+  <data name="PointEditorDescription" xml:space="preserve">
+    <value>Sadece sıcaklık noktaları ekleyebilir veya silebilirsiniz. Fan hızları, ana grafikteki noktalar sürüklenerek ayarlanabilir.</value>
+  </data>
+  <data name="TemperatureCelsius" xml:space="preserve">
+    <value>Sıcaklık (°C)</value>
+  </data>
+  <data name="AddNewPoint" xml:space="preserve">
+    <value>Yeni Nokta Ekle</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="SaveAndApply" xml:space="preserve">
+    <value>Kaydet ve Uygula</value>
+  </data>
+  <data name="TempBoundsWarning" xml:space="preserve">
+    <value>Sıcaklık 1 ile 99 °C arasında olmalıdır.</value>
+  </data>
+  <data name="PointExistsWarning" xml:space="preserve">
+    <value>{0}°C'de zaten bir nokta bulunuyor.</value>
+  </data>
+  <data name="ExampleTemp" xml:space="preserve">
+    <value>örn. 60</value>
+  </data>
+</root>
