@@ -1,9 +1,5 @@
-using Nexus.Service.Hubs;
 using Nexus.Service.Interfaces;
-using Nexus.Service.Services;
-using Nexus.Shared.Helpers;
 using Nexus.Shared.Models;
-using static Nexus.Service.Consts.HpWmiConstants;
 
 namespace Nexus.Service.Controllers;
 
@@ -11,7 +7,7 @@ namespace Nexus.Service.Controllers;
 internal sealed partial class FanController : IFanController, IDisposable
 {
     private readonly ILogger<FanController> _logger;
-    private readonly IAcpiService _acpiService;
+    private readonly IAcpiCmdService _acpiCmdService;
     private readonly Timer _watchdogTimer;
     private byte _maxCpuByte = 55;
     private byte _maxGpuByte = 55;
@@ -21,10 +17,10 @@ internal sealed partial class FanController : IFanController, IDisposable
 
     public FanController(
         ILogger<FanController> logger,
-        IAcpiService acpiService)
+        IAcpiCmdService acpiCmdService)
     {
         _logger = logger;
-        _acpiService = acpiService;
+        _acpiCmdService = acpiCmdService;
 
         _watchdogTimer = new Timer(WatchdogCallback, null, Timeout.Infinite, Timeout.Infinite);
     }
@@ -35,7 +31,7 @@ internal sealed partial class FanController : IFanController, IDisposable
     {
         LogInitializingLimits(_logger);
 
-        var tableResult = await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSGetFanTableQuery, [0, 0, 0, 0], BufferSize128).ConfigureAwait(false);
+        var tableResult = await _acpiCmdService.GetFanTableAsync().ConfigureAwait(false);
 
         if (tableResult.Success && tableResult.ReturnData != null && tableResult.ReturnData.Length > 2)
         {
@@ -64,18 +60,18 @@ internal sealed partial class FanController : IFanController, IDisposable
         CurrentMode = mode;
         LogChangingMode(_logger, mode);
 
-        await _acpiService.ExecuteAsync(Operation.GameManager, Feature.ThermalProfileSetup, [0, 0, 0, 0], BufferSize4).ConfigureAwait(false);
+        await _acpiCmdService.SetThermalProfileSetupAsync().ConfigureAwait(false);
 
         switch (mode)
         {
             case FanMode.Max:
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.FanSpeedMaxSetQuery, [PayloadMaxFanEnable, 0, 0, 0], BufferSize0).ConfigureAwait(false);
+                await _acpiCmdService.SetMaxFanSpeedAsync(true).ConfigureAwait(false);
                 _watchdogTimer.Change(TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(90));
                 break;
 
             case FanMode.Auto:
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.FanSpeedMaxSetQuery, [PayloadMaxFanDisable, 0, 0, 0], BufferSize0).ConfigureAwait(false);
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSFanSpeedSetQuery, [0, 0, 0, 0], BufferSize0).ConfigureAwait(false);
+                await _acpiCmdService.SetMaxFanSpeedAsync(false).ConfigureAwait(false);
+                await _acpiCmdService.SetFanSpeedAsync(0, 0).ConfigureAwait(false);
 
                 _lastCpuVal = 0;
                 _lastGpuVal = 0;
@@ -83,7 +79,7 @@ internal sealed partial class FanController : IFanController, IDisposable
                 break;
 
             case FanMode.Manual:
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.FanSpeedMaxSetQuery, [PayloadMaxFanDisable, 0, 0, 0], BufferSize0).ConfigureAwait(false);
+                await _acpiCmdService.SetMaxFanSpeedAsync(false).ConfigureAwait(false);
                 _watchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 break;
         }
@@ -105,13 +101,13 @@ internal sealed partial class FanController : IFanController, IDisposable
         _lastCpuVal = (byte)(cpuPercentage == 0 ? 0 : (cpuPercentage * _maxCpuByte / 100));
         _lastGpuVal = (byte)(gpuPercentage == 0 ? 0 : (gpuPercentage * _maxGpuByte / 100));
 
-        await _acpiService.ExecuteAsync(Operation.GameManager, Feature.ThermalProfileSetup, [0, 0, 0, 0], BufferSize4).ConfigureAwait(false);
-        await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSFanSpeedSetQuery, [_lastCpuVal, _lastGpuVal, 0, 0], BufferSize0).ConfigureAwait(false);
+        await _acpiCmdService.SetThermalProfileSetupAsync().ConfigureAwait(false);
+        await _acpiCmdService.SetFanSpeedAsync(_lastCpuVal, _lastGpuVal).ConfigureAwait(false);
     }
 
     public async Task<(int CpuRpm, int GpuRpm)> ReadFanRpmsAsync()
     {
-        var rpmResult = await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSFanSpeedGetQuery, [0, 0, 0, 0], BufferSize128).ConfigureAwait(false);
+        var rpmResult = await _acpiCmdService.GetFanRpmsAsync().ConfigureAwait(false);
 
         if (rpmResult.Success && rpmResult.ReturnData != null && rpmResult.ReturnData.Length >= 2)
         {
