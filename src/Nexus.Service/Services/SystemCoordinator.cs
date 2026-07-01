@@ -15,6 +15,7 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
     private readonly IMuxController _muxController;
     private readonly IConfigService _configService;
     private readonly ITelemetryHub _telemetryHub;
+    private readonly IPlatformSupportService _platformSupportService;
 
     private uint _nvidiaAdapterHandle;
     private CoreTempMonitor? _coreTempMonitor;
@@ -30,7 +31,8 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
         IFanController fanController,
         IMuxController muxController,
         IConfigService configService,
-        ITelemetryHub telemetryHub)
+        ITelemetryHub telemetryHub,
+        IPlatformSupportService platformSupportService)
     {
         _logger = logger;
         _coreTempLogger = coreTempLogger;
@@ -38,6 +40,7 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
         _muxController = muxController;
         _configService = configService;
         _telemetryHub = telemetryHub;
+        _platformSupportService = platformSupportService;
 
         _currentConfig = _configService.Load() ?? FanConfig.Default;
 
@@ -53,7 +56,8 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
 
         try
         {
-            await _fanController.InitializeAsync().ConfigureAwait(false);
+            var (isManualFanSupported, isMaxFanSupported) = await _platformSupportService.InitializeAsync().ConfigureAwait(false);
+            await _fanController.InitializeAsync(isManualFanSupported, isMaxFanSupported).ConfigureAwait(false);
             await _muxController.InitializeAsync().ConfigureAwait(false);
 
             LogInitialMuxStateCached(_logger, _muxController.CurrentMuxState);

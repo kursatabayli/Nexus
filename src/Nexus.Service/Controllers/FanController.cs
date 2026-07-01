@@ -14,6 +14,8 @@ internal sealed partial class FanController : IFanController, IDisposable
     private byte _lastCpuVal;
     private byte _lastGpuVal;
     private bool _disposed;
+    private bool _isManualFanSupported;
+    private bool _isMaxFanSupported;
 
     public FanController(
         ILogger<FanController> logger,
@@ -25,38 +27,35 @@ internal sealed partial class FanController : IFanController, IDisposable
         _watchdogTimer = new Timer(WatchdogCallback, null, Timeout.Infinite, Timeout.Infinite);
     }
 
+
     public FanMode CurrentMode { get; private set; } = FanMode.Auto;
 
-    public async Task InitializeAsync()
+    public async Task InitializeAsync(bool isManualFanSupported, bool isMaxFanSupported)
     {
         LogInitializingLimits(_logger);
 
-        var tableResult = await _acpiCmdService.GetFanTableAsync().ConfigureAwait(false);
+        _isManualFanSupported = isManualFanSupported;
+        _isMaxFanSupported = isMaxFanSupported;
 
-        if (tableResult.Success && tableResult.ReturnData != null && tableResult.ReturnData.Length > 2)
-        {
-            byte[] t = tableResult.ReturnData;
-            for (int i = 2; i < t.Length - 2; i += 3)
-            {
-                byte cpu = t[i];
-                byte gpu = t[i + 1];
-
-                if (cpu == 0 && gpu == 0) break;
-
-                if (cpu > _maxCpuByte) _maxCpuByte = cpu;
-                if (gpu > _maxGpuByte) _maxGpuByte = gpu;
-            }
-
-            LogLimitsInitialized(_logger, _maxCpuByte, _maxGpuByte);
-        }
+        if (_isManualFanSupported)
+            await InitializeFanLimitsAsync().ConfigureAwait(false);
         else
-        {
-            LogLimitsFailed(_logger);
-        }
+            LogHardwareReject(_logger, "Manuel Fan Desteklenmiyor. Limitler okunmayacak.");
     }
 
     public async Task SetFanModeAsync(FanMode mode)
     {
+        if (mode == FanMode.Max && !_isMaxFanSupported)
+        {
+            LogHardwareReject(_logger, "Max Fan Mode");
+            return;
+        }
+        if (mode == FanMode.Manual && !_isManualFanSupported)
+        {
+            LogHardwareReject(_logger, "Manual Fan Mode");
+            return;
+        }
+
         CurrentMode = mode;
         LogChangingMode(_logger, mode);
 
@@ -85,14 +84,6 @@ internal sealed partial class FanController : IFanController, IDisposable
         }
     }
 
-    private void WatchdogCallback(object? state)
-    {
-        if (CurrentMode == FanMode.Max)
-        {
-            _ = SetFanModeAsync(FanMode.Max);
-        }
-    }
-
     public async Task SetFanSpeedAsync(int cpuPercentage, int gpuPercentage)
     {
         cpuPercentage = Math.Clamp(cpuPercentage, 0, 100);
@@ -110,11 +101,45 @@ internal sealed partial class FanController : IFanController, IDisposable
         var rpmResult = await _acpiCmdService.GetFanRpmsAsync().ConfigureAwait(false);
 
         if (rpmResult.Success && rpmResult.ReturnData != null && rpmResult.ReturnData.Length >= 2)
-        {
             return (rpmResult.ReturnData[0] * 100, rpmResult.ReturnData[1] * 100);
-        }
 
         return (0, 0);
+    }
+
+    private async Task InitializeFanLimitsAsync()
+    {
+        var tableResult = await _acpiCmdService.GetFanTableAsync().ConfigureAwait(false);
+
+        if (tableResult.Success && tableResult.ReturnData != null && tableResult.ReturnData.Length > 2)
+        {
+            ReadOnlySpan<byte> t = tableResult.ReturnData;
+
+            for (int i = 2; i < t.Length - 2; i += 3)
+            {
+                byte cpu = t[i];
+                byte gpu = t[i + 1];
+
+                if (cpu == 0 && gpu == 0) break;
+
+                if (cpu > _maxCpuByte) _maxCpuByte = cpu;
+                if (gpu > _maxGpuByte) _maxGpuByte = gpu;
+            }
+
+            LogLimitsInitialized(_logger, _maxCpuByte, _maxGpuByte);
+        }
+        else
+        {
+            LogLimitsFailed(_logger);
+        }
+    }
+
+    private void WatchdogCallback(object? state)
+    {
+        if (CurrentMode == FanMode.Max)
+        {
+            LogWatchdogTriggered(_logger);
+            _ = Task.Run(() => SetFanModeAsync(FanMode.Max));
+        }
     }
 
     public void Dispose()
@@ -139,5 +164,8 @@ internal sealed partial class FanController : IFanController, IDisposable
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Information, Message = "Hardware: Applying Fan Mode '{Mode}' via ACPI...")]
     private static partial void LogChangingMode(ILogger logger, FanMode mode);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "Hardware Reject: The requested feature '{Feature}' is not supported by the system.")]
+    private static partial void LogHardwareReject(ILogger logger, string feature);
     #endregion
 }

@@ -4,6 +4,7 @@ using static Nexus.Service.Consts.HpWmiConstants;
 
 namespace Nexus.Service.Services;
 
+#pragma warning disable CA1812
 internal sealed class AcpiCmdService : IAcpiCmdService
 {
     private readonly IAcpiService _acpiService;

@@ -22,7 +22,7 @@ internal sealed class Program
         builder.Services.AddSingleton<IAcpiCmdService, AcpiCmdService>();
         builder.Services.AddSingleton<IAcpiService, AcpiService>();
         builder.Services.AddSingleton<ISystemCoordinator, SystemCoordinator>();
-        
+        builder.Services.AddSingleton<IPlatformSupportService, PlatformSupportService>();
         builder.Services.AddSingleton<ITelemetryHub, TelemetryHub>();
 
         builder.Services.AddSingleton<IFanController, FanController>();
