@@ -21,7 +21,10 @@ internal sealed partial class NexusRpcService(
     public async Task ForceResetFanModeAsync()
         => await hardwareService.ForceResetFanModeAsync().ConfigureAwait(false);
 
-    public Task<IReadOnlyList<MuxState>> GetSupportedMuxModesAsync() 
+    public Task<IReadOnlyList<FanMode>> GetSupportedFanModesAsync()
+        => Task.FromResult(hardwareService.SupportedFanModes);
+
+    public Task<IReadOnlyList<MuxState>> GetSupportedMuxModesAsync()
         => Task.FromResult(hardwareService.SupportedMuxModes);
 
     public Task<FanConfig> GetFanConfigAsync()

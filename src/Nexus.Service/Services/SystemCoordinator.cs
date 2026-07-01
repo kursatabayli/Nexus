@@ -22,8 +22,8 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
     private bool _isCoreTempConnected;
     private bool _isInitialized;
     private bool _disposed;
-
     private FanConfig _currentConfig;
+    private FanMode[] _supportedFanModes = [FanMode.Auto];
 
     public SystemCoordinator(
         ILogger<SystemCoordinator> logger,
@@ -49,6 +49,7 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
 
     public FanConfig CurrentFanConfig => _currentConfig;
     public IReadOnlyList<MuxState> SupportedMuxModes => _muxController.SupportedModes;
+    public IReadOnlyList<FanMode> SupportedFanModes => _supportedFanModes;
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -57,6 +58,15 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
         try
         {
             var (isManualFanSupported, isMaxFanSupported) = await _platformSupportService.InitializeAsync().ConfigureAwait(false);
+
+            _supportedFanModes = (isManualFanSupported, isMaxFanSupported) switch
+            {
+                (true, true) => [FanMode.Auto, FanMode.Manual, FanMode.Max],
+                (true, false) => [FanMode.Auto, FanMode.Manual],
+                (false, true) => [FanMode.Auto, FanMode.Max],
+                (false, false) => [FanMode.Auto]
+            };
+            
             await _fanController.InitializeAsync(isManualFanSupported, isMaxFanSupported).ConfigureAwait(false);
             await _muxController.InitializeAsync().ConfigureAwait(false);
 
@@ -97,11 +107,11 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
         );
     }
 
-    public async Task SetFanModeAsync(FanMode mode) 
+    public async Task SetFanModeAsync(FanMode mode)
         => await _fanController.SetFanModeAsync(mode).ConfigureAwait(false);
     public async Task ForceResetFanModeAsync()
         => await _fanController.SetFanModeAsync(FanMode.Auto).ConfigureAwait(false);
-    public async Task<bool> SetMuxStateAsync(MuxState targetMode) 
+    public async Task<bool> SetMuxStateAsync(MuxState targetMode)
         => await _muxController.ChangeMuxMode(targetMode).ConfigureAwait(false);
 
     public async Task ApplyFanConfigAsync(FanConfig newConfig)
@@ -129,7 +139,7 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
         }
     }
 
-    public IAsyncEnumerable<SystemStats> StreamTelemetryAsync(CancellationToken cancellationToken) 
+    public IAsyncEnumerable<SystemStats> StreamTelemetryAsync(CancellationToken cancellationToken)
         => _telemetryHub.SubscribeAsync(cancellationToken);
 
     private async void HandleTelemetryUpdate(SystemStats stats)
