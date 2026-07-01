@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text.Json;
 using Nexus.Service.Helpers;
 using Nexus.Service.Interfaces;
@@ -12,9 +13,12 @@ internal sealed partial class PlatformSupportService : IPlatformSupportService
     private readonly ILogger<PlatformSupportService> _logger;
     private readonly IAcpiCmdService _acpiCmdService;
 
-    private static readonly string[] _cursedBoards = ["8607", "8746", "8747", "8748", "8749", "874A"];
-    private readonly Dictionary<string, PerformancePlatformDto> _platformSupportMap = [];
-    private readonly Dictionary<string, DevicePlatformDto> _devicePlatformMap = [];
+    private static readonly FrozenSet<string> _cursedBoards = new[] { "8607", "8746", "8747", "8748", "8749", "874A" }.ToFrozenSet();
+    private FrozenDictionary<string, PerformancePlatformDto> _platformSupportMap = FrozenDictionary<string, PerformancePlatformDto>.Empty;
+    private FrozenDictionary<string, DevicePlatformDto> _devicePlatformMap = FrozenDictionary<string, DevicePlatformDto>.Empty;
+
+    private static readonly Lazy<string> _manufacturer = new(HardwareIdentifier.GetBaseBoardManufacturer);
+    private static readonly Lazy<string> _featureByte = new(HardwareIdentifier.GetFeatureByte);
 
     public bool IsManualFanSupported { get; private set; }
     public bool IsMaxFanSupported { get; private set; }
@@ -41,13 +45,7 @@ internal sealed partial class PlatformSupportService : IPlatformSupportService
         return (IsManualFanSupported, IsMaxFanSupported);
     }
 
-    private static bool DetermineManualFanSupport(byte[]? data)
-    {
-        if (data != null && data.Length >= 5)
-            return (data[4] & 1) > 0;
-
-        return false;
-    }
+    private static bool DetermineManualFanSupport(ReadOnlySpan<byte> data) => data.Length >= 5 && (data[4] & 1) > 0;
 
     private async Task<bool> DetermineMaxFanSupportAsync(string boardId, byte[]? data)
     {
@@ -90,14 +88,14 @@ internal sealed partial class PlatformSupportService : IPlatformSupportService
             if ((uint)(devicePlatform.Name - 59) <= 1u)
                 return true;
 
-            string manufacturer = HardwareIdentifier.GetBaseBoardManufacturer();
-            string featureByte = HardwareIdentifier.GetFeatureByte();
+            string manufacturer = _manufacturer.Value;
+            string featureByte = _featureByte.Value;
             string displayName = devicePlatform.DisplayName ?? string.Empty;
 
-            bool isHP = manufacturer.Contains("HP") || manufacturer.Contains("Hewlett-Packard");
+            bool isHP = manufacturer.Contains("HP", StringComparison.OrdinalIgnoreCase) || manufacturer.Contains("Hewlett-Packard", StringComparison.OrdinalIgnoreCase);
             bool isOmen = displayName.Contains("OMEN", StringComparison.OrdinalIgnoreCase);
             bool isDuskersOrNone = devicePlatform.Name == DeviceType.Duskers || devicePlatform.Name == DeviceType.None;
-            bool hasPavilionFlags = featureByte.Contains("7K") && featureByte.Contains("fd");
+            bool hasPavilionFlags = featureByte.Contains("7K", StringComparison.Ordinal) && featureByte.Contains("fd", StringComparison.Ordinal);
 
             if (isHP && !isOmen && !isDuskersOrNone && hasPavilionFlags)
                 return true;
@@ -119,11 +117,13 @@ internal sealed partial class PlatformSupportService : IPlatformSupportService
 
             if (platforms != null)
             {
+                var tempDict = new Dictionary<string, PerformancePlatformDto>(StringComparer.Ordinal);
                 foreach (var platform in platforms)
                 {
                     if (!string.IsNullOrWhiteSpace(platform.SSID))
-                        _platformSupportMap[platform.SSID] = platform;
+                        tempDict[platform.SSID] = platform;
                 }
+                _platformSupportMap = tempDict.ToFrozenDictionary(StringComparer.Ordinal);
             }
         }
         catch (IOException ex)
@@ -149,15 +149,17 @@ internal sealed partial class PlatformSupportService : IPlatformSupportService
 
             if (platforms != null)
             {
+                var tempDict = new Dictionary<string, DevicePlatformDto>(StringComparer.Ordinal);
                 foreach (var platform in platforms)
                 {
                     if (platform.ProductNum == null) continue;
                     foreach (var product in platform.ProductNum)
                     {
                         if (!string.IsNullOrWhiteSpace(product))
-                            _devicePlatformMap[product] = platform;
+                            tempDict[product] = platform;
                     }
                 }
+                _devicePlatformMap = tempDict.ToFrozenDictionary(StringComparer.Ordinal);
             }
         }
         catch (IOException ex)
