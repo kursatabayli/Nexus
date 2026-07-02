@@ -10,7 +10,7 @@ public sealed partial class FanModeSelector : ComponentBase
     [Parameter] public FanMode CurrentMode { get; set; } = FanMode.Auto;
     [Parameter] public EventCallback<FanMode> CurrentModeChanged { get; set; }
     [Parameter] public bool CoreTempExists { get; set; }
-    [Parameter] public required IReadOnlyList<FanMode> SupportedModes { get; set; }
+    [Parameter] public IReadOnlyList<FanMode> SupportedModes { get; set; } = [];
 
     private Task OnModeChanged(FanMode mode)
     {
