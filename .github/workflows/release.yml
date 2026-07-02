@@ -1,0 +1,42 @@
+name: Build and Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Windows x64 Release
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.x'
+
+    - name: Extract Version from Tag
+      shell: bash
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+    - name: Publish Background Service (Native AOT)
+      run: dotnet publish src/Nexus.Service/Nexus.Service.csproj -c Release -r win-x64 --self-contained true -o ./publish/Service -p:Version=${{ env.VERSION }}
+
+    - name: Publish Client UI
+      run: dotnet publish src/Nexus.Client/Nexus.Client.csproj -c Release -r win-x64 --self-contained true -o ./publish/Client -p:Version=${{ env.VERSION }}
+
+    - name: Compile Inno Setup Installer
+      run: iscc /DAppVersion="${{ env.VERSION }}" build/installer.iss
+      
+    - name: Create Draft Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: Output/Nexus_Setup_*.exe
+        draft: true
+        generate_release_notes: true
