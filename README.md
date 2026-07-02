@@ -1,5 +1,9 @@
 # Nexus
 
+> [!WARNING]
+> **WORK IN PROGRESS - DO NOT RUN YET**
+> 
+> Nexus is currently under active development and is **not finished**. It is currently **unsafe and unsuitable for execution**. Core features, hardware safety checks, and underlying architecture are incomplete. Please do not attempt to compile or run this software on your machine until an official release is announced.
 **Pure, clean, and bloat-free central hardware controller for HP laptops.**
 
 You shouldn't need a bloated app eating up gigabytes of RAM, tracking your gaming habits, and shoving ads in your face just to change a fan speed or switch a MUX state. 
@@ -27,11 +31,12 @@ To accurately read real-time CPU temperatures and adjust fan speeds dynamically,
 
 ## Important Warnings & Disclaimer
 
-**READ CAREFULLY BEFORE USING**
-
-* **Tested ONLY on HP Victus 16:** At this stage, this software has been exclusively developed and tested on the HP Victus 16 series.
-* **Other Models are UNTESTED:** While other HP series (such as Omen or different Victus iterations) may share the same underlying ACPI/WMI architecture, **they are not tested.** Necessary hardware safety checks, maximum RPM limits, and thermal boundaries for other mainboards have not been implemented yet. Using this on untested devices may cause unpredictable behavior.
-* **USE AT YOUR OWN RISK:** This software interacts directly with your system's hardware, embedded controller (EC), and ACPI tables. The developer assumes absolutely NO responsibility for any hardware damage, overheating, data loss, or system instability. You accept all risks and consequences by running this software.
+> [!CAUTION]
+> **READ CAREFULLY BEFORE USING**
+> 
+> * **Tested ONLY on HP Victus 16:** At this stage, this software has been exclusively developed and tested on the HP Victus 16 series.
+> * **Other Models are UNTESTED:** While other HP series (such as Omen or different Victus iterations) may share the same underlying ACPI/WMI architecture, **they are not tested.** Necessary hardware safety checks, maximum RPM limits, and thermal boundaries for other mainboards have not been implemented yet. Using this on untested devices may cause unpredictable behavior.
+> * **USE AT YOUR OWN RISK:** This software interacts directly with your system's hardware, embedded controller (EC), and ACPI tables. The developer assumes absolutely NO responsibility for any hardware damage, overheating, data loss, or system instability. You accept all risks and consequences by running this software.
 
 ## Architecture
 
