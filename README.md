@@ -46,4 +46,4 @@ The project consists of two tightly integrated components:
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](https://github.com/kursatabayli/Nexus?tab=GPL-3.0-1-ov-file) file for details.
