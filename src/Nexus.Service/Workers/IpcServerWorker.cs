@@ -1,9 +1,11 @@
-using System.Diagnostics.CodeAnalysis;
-using System.IO.Pipes;
-using System.Text.Json.Serialization.Metadata;
 using Nexus.Shared.Interfaces;
 using Nexus.Shared.Serialization;
 using StreamJsonRpc;
+using System.Diagnostics.CodeAnalysis;
+using System.IO.Pipes;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Nexus.Service.Workers;
 
@@ -20,21 +22,46 @@ internal sealed partial class IpcServerWorker(
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            NamedPipeServerStream? pipeServer = null;
+
             try
             {
-                var pipeServer = new NamedPipeServerStream(
+                var pipeSecurity = new PipeSecurity();
+
+                var interactiveSid = new SecurityIdentifier(WellKnownSidType.InteractiveSid, null);
+
+                pipeSecurity.AddAccessRule(new PipeAccessRule(
+                    interactiveSid,
+                    PipeAccessRights.ReadWrite,
+                    AccessControlType.Allow));
+
+                using (var identity = WindowsIdentity.GetCurrent())
+                {
+                    if (identity.User != null)
+                    {
+                        pipeSecurity.AddAccessRule(new PipeAccessRule(
+                            identity.User,
+                            PipeAccessRights.FullControl,
+                            AccessControlType.Allow));
+                    }
+                }
+
+                pipeServer = NamedPipeServerStreamAcl.Create(
                     pipeName: PipeName,
                     direction: PipeDirection.InOut,
-                    maxNumberOfServerInstances: NamedPipeServerStream.MaxAllowedServerInstances,
+                    maxNumberOfServerInstances: 1,
                     transmissionMode: PipeTransmissionMode.Byte,
-                    options: PipeOptions.Asynchronous);
+                    options: PipeOptions.Asynchronous,
+                    inBufferSize: 0,
+                    outBufferSize: 0,
+                    pipeSecurity: pipeSecurity);
 
                 LogWaitingForClient(logger);
 
                 await pipeServer.WaitForConnectionAsync(stoppingToken).ConfigureAwait(false);
                 LogClientConnected(logger);
 
-                _ = HandleClientAsync(pipeServer, stoppingToken);
+                await HandleClientAsync(pipeServer, stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -48,6 +75,11 @@ internal sealed partial class IpcServerWorker(
             {
                 LogServerUnexpectedError(logger, ex);
                 await Task.Delay(2000, stoppingToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (pipeServer != null)
+                    await pipeServer.DisposeAsync().ConfigureAwait(false);
             }
         }
     }

@@ -11,7 +11,7 @@ namespace Nexus.Client.Components.Dashboard;
 public sealed partial class FanPanel : ComponentBase
 {
     [Inject] ISnackbar Snackbar { get; set; } = default!;
-    [Inject] NexusBackendClient BackendClient { get; set; } = default!;
+    [Inject] IpcClient BackendClient { get; set; } = default!;
 
     [Parameter] public SystemStats? CurrentStats { get; set; }
     [Parameter] public IReadOnlyList<FanMode> SupportedModes { get; set; } = [];
