@@ -1,17 +1,18 @@
 #ifndef AppVersion
-#define AppVersion "local-test"
+#define AppVersion "0.0.0-dev"
 #endif
 
 #define AppName "Nexus"
 #define AppPublisher "Nexus Project"
 #define AppExeName "Nexus App.exe"
+#define AppGUID "cbf2e120-032c-42bc-9658-6fe3ac1186d4"
 
 [Setup]
-AppId={{cbf2e120-032c-42bc-9658-6fe3ac1186d4} 
+AppId={{{#AppGUID}} 
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher={#AppPublisher}
-AppMutex=Global\NexusClientMutex-{cbf2e120-032c-42bc-9658-6fe3ac1186d4}
+AppMutex=Global\NexusClientMutex-{{{#AppGUID}}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 OutputDir=..\Output
