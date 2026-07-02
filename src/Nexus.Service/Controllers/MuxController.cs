@@ -9,12 +9,12 @@ namespace Nexus.Service.Controllers;
 internal sealed partial class MuxController : IMuxController
 {
     private readonly ILogger<MuxController> _logger;
-    private readonly IAcpiService _acpiService;
+    private readonly IAcpiCmdService _acpiCmdService;
 
-    public MuxController(ILogger<MuxController> logger, IAcpiService acpiService)
+    public MuxController(ILogger<MuxController> logger, IAcpiCmdService acpiCmdService)
     {
         _logger = logger;
-        _acpiService = acpiService;
+        _acpiCmdService = acpiCmdService;
     }
 
     public MuxState CurrentMuxState { get; private set; } = MuxState.Undefined;
@@ -25,7 +25,7 @@ internal sealed partial class MuxController : IMuxController
     {
         await GetSupportedModesAsync().ConfigureAwait(false);
 
-        var muxResult = await _acpiService.ExecuteAsync(Operation.Read, Feature.GraphicsMux, [0, 0, 0, 0], BufferSize4).ConfigureAwait(false);
+        var muxResult = await _acpiCmdService.ReadMuxStateAsync().ConfigureAwait(false);
         if (muxResult.Success && muxResult.ReturnCode != 3 && muxResult.ReturnCode != 4 && muxResult.ReturnData != null && muxResult.ReturnData.Length > 0)
         {
             sbyte state = (sbyte)(muxResult.ReturnData[0] & MuxModeMask);
@@ -62,7 +62,7 @@ internal sealed partial class MuxController : IMuxController
 
         LogMuxChangeRequest(_logger, targetMode);
 
-        var muxWrite = await _acpiService.ExecuteAsync(Operation.Write, Feature.GraphicsMux, [(byte)targetMode, 0, 0, 0], BufferSize4).ConfigureAwait(false);
+        var muxWrite = await _acpiCmdService.WriteMuxStateAsync((byte)targetMode).ConfigureAwait(false);
 
         if (muxWrite.Success && muxWrite.ReturnCode != 3 && muxWrite.ReturnCode != 4)
         {
@@ -79,7 +79,7 @@ internal sealed partial class MuxController : IMuxController
 
     private async Task GetSupportedModesAsync()
     {
-        var result = await _acpiService.ExecuteAsync(Operation.GameManager, Feature.SystemDesignData, [0, 0, 0, 0], BufferSize128).ConfigureAwait(false);
+        var result = await _acpiCmdService.GetSystemDesignDataAsync().ConfigureAwait(false);
 
         if (result.Success && result.ReturnCode != 3 && result.ReturnCode != 4 && result.ReturnData?.Length > 7)
         {
@@ -91,7 +91,7 @@ internal sealed partial class MuxController : IMuxController
         }
 
         LogLegacyFallbackAttempt(_logger);
-        var legacyResult = await _acpiService.ExecuteAsync(Operation.Read, Feature.GraphicsMux, [0, 0, 0, 0], BufferSize4).ConfigureAwait(false);
+        var legacyResult = await _acpiCmdService.ReadMuxStateAsync().ConfigureAwait(false);
 
         if (legacyResult.Success && legacyResult.ReturnCode != 3 && legacyResult.ReturnCode != 4)
         {

@@ -19,19 +19,20 @@ internal sealed class Program
         });
 
         builder.Services.AddSingleton<IConfigService, ConfigService>();
+        builder.Services.AddSingleton<IAcpiCmdService, AcpiCmdService>();
         builder.Services.AddSingleton<IAcpiService, AcpiService>();
         builder.Services.AddSingleton<ISystemCoordinator, SystemCoordinator>();
-        
+        builder.Services.AddSingleton<IPlatformSupportService, PlatformSupportService>();
         builder.Services.AddSingleton<ITelemetryHub, TelemetryHub>();
 
         builder.Services.AddSingleton<IFanController, FanController>();
         builder.Services.AddSingleton<IMuxController, MuxController>();
 
         builder.Services.AddSingleton<INexusRpcService, NexusRpcService>();
-
+        
+        builder.Services.AddHostedService<IpcServerWorker>();
         builder.Services.AddHostedService<SystemInitializationWorker>();
         builder.Services.AddHostedService<NexusCoreWorker>();
-        builder.Services.AddHostedService<IpcServerWorker>();
 
         var host = builder.Build();
         

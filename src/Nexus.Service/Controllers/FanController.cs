@@ -1,9 +1,5 @@
-using Nexus.Service.Hubs;
 using Nexus.Service.Interfaces;
-using Nexus.Service.Services;
-using Nexus.Shared.Helpers;
 using Nexus.Shared.Models;
-using static Nexus.Service.Consts.HpWmiConstants;
 
 namespace Nexus.Service.Controllers;
 
@@ -11,35 +7,113 @@ namespace Nexus.Service.Controllers;
 internal sealed partial class FanController : IFanController, IDisposable
 {
     private readonly ILogger<FanController> _logger;
-    private readonly IAcpiService _acpiService;
+    private readonly IAcpiCmdService _acpiCmdService;
     private readonly Timer _watchdogTimer;
     private byte _maxCpuByte = 55;
     private byte _maxGpuByte = 55;
     private byte _lastCpuVal;
     private byte _lastGpuVal;
     private bool _disposed;
+    private bool _isManualFanSupported;
+    private bool _isMaxFanSupported;
 
     public FanController(
         ILogger<FanController> logger,
-        IAcpiService acpiService)
+        IAcpiCmdService acpiCmdService)
     {
         _logger = logger;
-        _acpiService = acpiService;
+        _acpiCmdService = acpiCmdService;
 
         _watchdogTimer = new Timer(WatchdogCallback, null, Timeout.Infinite, Timeout.Infinite);
     }
 
+
     public FanMode CurrentMode { get; private set; } = FanMode.Auto;
 
-    public async Task InitializeAsync()
+    public async Task InitializeAsync(bool isManualFanSupported, bool isMaxFanSupported)
     {
         LogInitializingLimits(_logger);
 
-        var tableResult = await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSGetFanTableQuery, [0, 0, 0, 0], BufferSize128).ConfigureAwait(false);
+        _isManualFanSupported = isManualFanSupported;
+        _isMaxFanSupported = isMaxFanSupported;
+
+        if (_isManualFanSupported)
+            await InitializeFanLimitsAsync().ConfigureAwait(false);
+        else
+            LogHardwareReject(_logger, "Manuel Fan Desteklenmiyor. Limitler okunmayacak.");
+    }
+
+    public async Task SetFanModeAsync(FanMode mode)
+    {
+        if (mode == FanMode.Max && !_isMaxFanSupported)
+        {
+            LogHardwareReject(_logger, "Max Fan Mode");
+            return;
+        }
+        if (mode == FanMode.Manual && !_isManualFanSupported)
+        {
+            LogHardwareReject(_logger, "Manual Fan Mode");
+            return;
+        }
+
+        CurrentMode = mode;
+        LogChangingMode(_logger, mode);
+
+        await _acpiCmdService.SetThermalProfileSetupAsync().ConfigureAwait(false);
+
+        switch (mode)
+        {
+            case FanMode.Max:
+                await _acpiCmdService.SetMaxFanSpeedAsync(true).ConfigureAwait(false);
+                _watchdogTimer.Change(TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(90));
+                break;
+
+            case FanMode.Auto:
+                await _acpiCmdService.SetMaxFanSpeedAsync(false).ConfigureAwait(false);
+                await _acpiCmdService.SetFanSpeedAsync(0, 0).ConfigureAwait(false);
+
+                _lastCpuVal = 0;
+                _lastGpuVal = 0;
+                _watchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                break;
+
+            case FanMode.Manual:
+                await _acpiCmdService.SetMaxFanSpeedAsync(false).ConfigureAwait(false);
+                _watchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                break;
+        }
+    }
+
+    public async Task SetFanSpeedAsync(int cpuPercentage, int gpuPercentage)
+    {
+        cpuPercentage = Math.Clamp(cpuPercentage, 0, 100);
+        gpuPercentage = Math.Clamp(gpuPercentage, 0, 100);
+
+        _lastCpuVal = (byte)(cpuPercentage == 0 ? 0 : (cpuPercentage * _maxCpuByte / 100));
+        _lastGpuVal = (byte)(gpuPercentage == 0 ? 0 : (gpuPercentage * _maxGpuByte / 100));
+
+        await _acpiCmdService.SetThermalProfileSetupAsync().ConfigureAwait(false);
+        await _acpiCmdService.SetFanSpeedAsync(_lastCpuVal, _lastGpuVal).ConfigureAwait(false);
+    }
+
+    public async Task<(int CpuRpm, int GpuRpm)> ReadFanRpmsAsync()
+    {
+        var rpmResult = await _acpiCmdService.GetFanRpmsAsync().ConfigureAwait(false);
+
+        if (rpmResult.Success && rpmResult.ReturnData != null && rpmResult.ReturnData.Length >= 2)
+            return (rpmResult.ReturnData[0] * 100, rpmResult.ReturnData[1] * 100);
+
+        return (0, 0);
+    }
+
+    private async Task InitializeFanLimitsAsync()
+    {
+        var tableResult = await _acpiCmdService.GetFanTableAsync().ConfigureAwait(false);
 
         if (tableResult.Success && tableResult.ReturnData != null && tableResult.ReturnData.Length > 2)
         {
-            byte[] t = tableResult.ReturnData;
+            ReadOnlySpan<byte> t = tableResult.ReturnData;
+
             for (int i = 2; i < t.Length - 2; i += 3)
             {
                 byte cpu = t[i];
@@ -59,66 +133,13 @@ internal sealed partial class FanController : IFanController, IDisposable
         }
     }
 
-    public async Task SetFanModeAsync(FanMode mode)
-    {
-        CurrentMode = mode;
-        LogChangingMode(_logger, mode);
-
-        await _acpiService.ExecuteAsync(Operation.GameManager, Feature.ThermalProfileSetup, [0, 0, 0, 0], BufferSize4).ConfigureAwait(false);
-
-        switch (mode)
-        {
-            case FanMode.Max:
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.FanSpeedMaxSetQuery, [PayloadMaxFanEnable, 0, 0, 0], BufferSize0).ConfigureAwait(false);
-                _watchdogTimer.Change(TimeSpan.FromSeconds(90), TimeSpan.FromSeconds(90));
-                break;
-
-            case FanMode.Auto:
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.FanSpeedMaxSetQuery, [PayloadMaxFanDisable, 0, 0, 0], BufferSize0).ConfigureAwait(false);
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSFanSpeedSetQuery, [0, 0, 0, 0], BufferSize0).ConfigureAwait(false);
-
-                _lastCpuVal = 0;
-                _lastGpuVal = 0;
-                _watchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                break;
-
-            case FanMode.Manual:
-                await _acpiService.ExecuteAsync(Operation.GameManager, Feature.FanSpeedMaxSetQuery, [PayloadMaxFanDisable, 0, 0, 0], BufferSize0).ConfigureAwait(false);
-                _watchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                break;
-        }
-    }
-
     private void WatchdogCallback(object? state)
     {
         if (CurrentMode == FanMode.Max)
         {
-            _ = SetFanModeAsync(FanMode.Max);
+            LogWatchdogTriggered(_logger);
+            _ = Task.Run(() => SetFanModeAsync(FanMode.Max));
         }
-    }
-
-    public async Task SetFanSpeedAsync(int cpuPercentage, int gpuPercentage)
-    {
-        cpuPercentage = Math.Clamp(cpuPercentage, 0, 100);
-        gpuPercentage = Math.Clamp(gpuPercentage, 0, 100);
-
-        _lastCpuVal = (byte)(cpuPercentage == 0 ? 0 : (cpuPercentage * _maxCpuByte / 100));
-        _lastGpuVal = (byte)(gpuPercentage == 0 ? 0 : (gpuPercentage * _maxGpuByte / 100));
-
-        await _acpiService.ExecuteAsync(Operation.GameManager, Feature.ThermalProfileSetup, [0, 0, 0, 0], BufferSize4).ConfigureAwait(false);
-        await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSFanSpeedSetQuery, [_lastCpuVal, _lastGpuVal, 0, 0], BufferSize0).ConfigureAwait(false);
-    }
-
-    public async Task<(int CpuRpm, int GpuRpm)> ReadFanRpmsAsync()
-    {
-        var rpmResult = await _acpiService.ExecuteAsync(Operation.GameManager, Feature.VictusSFanSpeedGetQuery, [0, 0, 0, 0], BufferSize128).ConfigureAwait(false);
-
-        if (rpmResult.Success && rpmResult.ReturnData != null && rpmResult.ReturnData.Length >= 2)
-        {
-            return (rpmResult.ReturnData[0] * 100, rpmResult.ReturnData[1] * 100);
-        }
-
-        return (0, 0);
     }
 
     public void Dispose()
@@ -143,5 +164,8 @@ internal sealed partial class FanController : IFanController, IDisposable
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Information, Message = "Hardware: Applying Fan Mode '{Mode}' via ACPI...")]
     private static partial void LogChangingMode(ILogger logger, FanMode mode);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "Hardware Reject: The requested feature '{Feature}' is not supported by the system.")]
+    private static partial void LogHardwareReject(ILogger logger, string feature);
     #endregion
 }

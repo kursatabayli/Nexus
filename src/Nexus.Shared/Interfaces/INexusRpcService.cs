@@ -10,6 +10,7 @@ public partial interface INexusRpcService
 {
     Task SetFanModeAsync(FanMode mode);
     Task<bool> SetMuxStateAsync(MuxState targetMode);
+    Task<IReadOnlyList<FanMode>> GetSupportedFanModesAsync();
     Task<IReadOnlyList<MuxState>> GetSupportedMuxModesAsync();
     Task ForceResetFanModeAsync();
     IAsyncEnumerable<SystemStats> StreamTelemetryAsync(CancellationToken cancellationToken);

@@ -5,6 +5,7 @@ namespace Nexus.Service.Interfaces;
 internal interface ISystemCoordinator
 {
     FanConfig CurrentFanConfig { get; }
+    IReadOnlyList<FanMode> SupportedFanModes { get; }
     IReadOnlyList<MuxState> SupportedMuxModes { get; }
     Task InitializeAsync(CancellationToken cancellationToken = default);
     Task<SystemStats> GetSystemStatsAsync(bool isUiConnected);
