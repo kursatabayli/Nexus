@@ -39,9 +39,11 @@
             }
         };
     </script>
-    <!-- <script>
+    <script>
         window.addEventListener('contextmenu', e => e.preventDefault());
-    </script> -->
+        window.addEventListener('wheel', (e) => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+        window.addEventListener('gesturestart', (e) => { e.preventDefault(); });
+    </script>
 </body>
 
 </html>

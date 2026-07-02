@@ -18,6 +18,13 @@ internal sealed class Program
             options.ServiceName = "Nexus Background Service";
         });
 
+        builder.Services.AddLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddConsole();
+            logging.SetMinimumLevel(LogLevel.Warning);
+        });
+
         builder.Services.AddSingleton<IConfigService, ConfigService>();
         builder.Services.AddSingleton<IAcpiCmdService, AcpiCmdService>();
         builder.Services.AddSingleton<IAcpiService, AcpiService>();
@@ -29,13 +36,13 @@ internal sealed class Program
         builder.Services.AddSingleton<IMuxController, MuxController>();
 
         builder.Services.AddSingleton<INexusRpcService, NexusRpcService>();
-        
+
         builder.Services.AddHostedService<IpcServerWorker>();
         builder.Services.AddHostedService<SystemInitializationWorker>();
         builder.Services.AddHostedService<NexusCoreWorker>();
 
         var host = builder.Build();
-        
+
         host.Run();
     }
 }
