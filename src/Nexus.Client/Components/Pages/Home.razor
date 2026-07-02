@@ -27,7 +27,7 @@ else
 
         <MudTabPanel Text="@Lang.FanControl" Visible="_supportedFanModes != null && _supportedFanModes.Count > 1"
                      Icon="@Icons.Material.Filled.Air">
-            <FanPanel CurrentStats="@_currentStats" />
+            <FanPanel SupportedModes="_supportedFanModes" CurrentStats="@_currentStats" />
         </MudTabPanel>
 
         <MudTabPanel Text="@Lang.MuxSwitch" Icon="@Icons.Material.Filled.DeveloperBoard" Visible="_isMuxSupported">
