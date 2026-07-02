@@ -15,13 +15,13 @@
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
 
             <FanModeSelector CurrentMode="@(CurrentStats?.CurrentMode ?? FanMode.Auto)" CurrentModeChanged="HandleModeChange"
-                             IsManualModeDisabled="@(CurrentStats?.CpuTemp == -1)" />
+                             CoreTempExists="@(CurrentStats?.CpuTemp != -1)" SupportedModes="SupportedModes" />
         </MudStack>
     </MudStack>
 
     <MudDivider />
 
-    <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pt-6 pb-8"
+    <MudTabs Elevation="0" Disabled="!SupportedModes.Contains(FanMode.Manual)" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pt-6 pb-8"
              Style="transition: all 0.3s ease;">
 
         <MudTabPanel Text="@Lang.CpuFan" Icon="@Icons.Material.Filled.Memory">

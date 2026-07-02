@@ -11,20 +11,23 @@
             <MudAlert Severity="Severity.Error" Class="mt-4">
                 @Lang.ServiceNotFoundWarning
             </MudAlert>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="RetryConnection">@Lang.Retry</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="RetryConnection">@Lang.Retry
+            </MudButton>
         }
     </MudStack>
 }
 else
 {
-    <MudTabs Centered="true" Border="true" ApplyEffectsToContainer="true" TabHeaderClass="mx-auto home-tab-header" TabPanelsClass="pa-6" Color="Color.Primary">
+    <MudTabs Centered="true" Border="true" ApplyEffectsToContainer="true" TabHeaderClass="mx-auto home-tab-header"
+             TabPanelsClass="pa-6" Color="Color.Primary">
 
         <MudTabPanel Text="@Lang.SystemStats" Icon="@Icons.Material.Filled.QueryStats">
             <StatsDisplay CurrentStats="@_currentStats" />
         </MudTabPanel>
 
-        <MudTabPanel Text="@Lang.FanControl" Icon="@Icons.Material.Filled.Air">
-            <FanPanel CurrentStats="@_currentStats" />
+        <MudTabPanel Text="@Lang.FanControl" Visible="_supportedFanModes != null && _supportedFanModes.Count > 1"
+                     Icon="@Icons.Material.Filled.Air">
+            <FanPanel SupportedModes="_supportedFanModes" CurrentStats="@_currentStats" />
         </MudTabPanel>
 
         <MudTabPanel Text="@Lang.MuxSwitch" Icon="@Icons.Material.Filled.DeveloperBoard" Visible="_isMuxSupported">

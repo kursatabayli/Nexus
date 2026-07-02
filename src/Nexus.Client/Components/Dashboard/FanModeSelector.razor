@@ -1,11 +1,10 @@
 <MudTabs Color="Color.Primary" Outlined="true" Ripple="true" ActivePanelIndex="(int)CurrentMode">
-    <MudTabPanel Text="@Lang.Auto" Icon="@Icons.Material.Filled.AutoMode"
-                 OnClick="() => OnModeChanged(FanMode.Auto)" />
+    <MudTabPanel Text="@Lang.Auto" Icon="@Icons.Material.Filled.AutoMode" OnClick="() => OnModeChanged(FanMode.Auto)" />
 
-    <MudTabPanel Text="@Lang.Manual" Disabled="@IsManualModeDisabled" Icon="@Icons.Material.Filled.Tune"
-                 ToolTip="@(IsManualModeDisabled ? Lang.ManualModeDisabledTooltip : null)"
+    <MudTabPanel Text="@Lang.Manual" Disabled="!CoreTempExists" Visible="SupportedModes.Contains(FanMode.Manual)"
+                 Icon="@Icons.Material.Filled.Tune" ToolTip="@(CoreTempExists ? null : Lang.ManualModeDisabledTooltip)"
                  OnClick="() => OnModeChanged(FanMode.Manual)" />
 
-    <MudTabPanel Text="@Lang.Max" Icon="@Icons.Material.Filled.RocketLaunch"
-                 OnClick="() => OnModeChanged(FanMode.Max)" />
+    <MudTabPanel Text="@Lang.Max" Visible="SupportedModes.Contains(FanMode.Max)"
+                 Icon="@Icons.Material.Filled.RocketLaunch" OnClick="() => OnModeChanged(FanMode.Max)" />
 </MudTabs>

@@ -14,16 +14,17 @@ public sealed partial class Home : ComponentBase, IAsyncDisposable
     private bool _connectionFailed;
 
     private SystemStats? _currentStats;
-    
+
     private CancellationTokenSource? _streamCts;
     private IReadOnlyList<MuxState>? _supportedMuxModes;
+    private IReadOnlyList<FanMode>? _supportedFanModes;
     private bool _isMuxSupported => _supportedMuxModes != null && _supportedMuxModes.Count > 0;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await TryConnectAsync().ConfigureAwait(true);
-            StateHasChanged(); 
+            StateHasChanged();
         }
     }
 
@@ -41,7 +42,11 @@ public sealed partial class Home : ComponentBase, IAsyncDisposable
         else
         {
             if (BackendClient.Proxy != null)
+            {
                 _supportedMuxModes = await BackendClient.Proxy.GetSupportedMuxModesAsync().ConfigureAwait(true);
+                _supportedFanModes = await BackendClient.Proxy.GetSupportedFanModesAsync().ConfigureAwait(true);
+
+            }
 
             _ = StartTelemetryStreamAsync();
         }
@@ -49,10 +54,10 @@ public sealed partial class Home : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
-   private async Task StartTelemetryStreamAsync()
+    private async Task StartTelemetryStreamAsync()
     {
         _streamCts = new CancellationTokenSource();
-        
+
         try
         {
             if (BackendClient.IsConnected && BackendClient.Proxy != null)
@@ -77,7 +82,7 @@ public sealed partial class Home : ComponentBase, IAsyncDisposable
     }
 
     private async Task RetryConnection() => await TryConnectAsync().ConfigureAwait(true);
-    
+
     public async ValueTask DisposeAsync()
     {
         if (_streamCts != null)
