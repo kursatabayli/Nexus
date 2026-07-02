@@ -12,7 +12,7 @@ namespace Nexus.Client.Components.Dashboard;
 public sealed partial class StatsDisplay : ComponentBase
 {
   [Parameter] public SystemStats? CurrentStats { get; set; }
-  [Inject] NexusBackendClient BackendClient { get; set; } = default!;
+  [Inject] IpcClient BackendClient { get; set; } = default!;
   [Inject] ISnackbar Snackbar { get; set; } = default!;
   private readonly SensorModel[] _sensors = new SensorModel[2];
   private static readonly string[] _colorCache = new string[101];

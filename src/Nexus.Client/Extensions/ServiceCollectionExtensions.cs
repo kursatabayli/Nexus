@@ -20,7 +20,7 @@ internal static class ServiceCollectionExtensions
 
         services.AddNexusLocalization();
 
-        services.AddSingleton<NexusBackendClient>();
+        services.AddSingleton<IpcClient>();
 
         return services;
     }

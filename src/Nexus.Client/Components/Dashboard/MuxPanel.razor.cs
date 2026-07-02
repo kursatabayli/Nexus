@@ -12,7 +12,7 @@ namespace Nexus.Client.Components.Dashboard;
 [SuppressMessage("Design", "CA1515:Consider making public types internal", Justification = "Blazor components must be public for the framework's routing and rendering mechanisms.")]
 public sealed partial class MuxPanel : ComponentBase
 {
-    [Inject] private NexusBackendClient BackendClient { get; set; } = null!;
+    [Inject] private IpcClient BackendClient { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     [Parameter] public IReadOnlyList<MuxState> SupportedModes { get; set; } = [];

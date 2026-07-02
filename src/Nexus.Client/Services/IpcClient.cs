@@ -8,7 +8,7 @@ using StreamJsonRpc;
 namespace Nexus.Client.Services;
 
 #pragma warning disable CA1812
-internal sealed partial class NexusBackendClient : IAsyncDisposable
+internal sealed partial class IpcClient : IAsyncDisposable
 {
     private const string PipeName = "NexusIpcPipe";
 
