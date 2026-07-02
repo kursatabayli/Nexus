@@ -14,7 +14,7 @@
                              Class="@GetCardClasses(mode)"
                              @onclick="@(() => HandleCardClickAsync(mode))">
 
-                        <MudCardContent Class="d-flex flex-column align-center text-center pa-6 flex-grow-1">
+                        <MudCardContent Class="d-flex flex-column align-center text-center pa-6 grow">
 
                             <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mux-icon-wrapper mb-2">
                                 <MudIcon Icon="@GetModeIcon(mode)"
@@ -26,7 +26,7 @@
                                 @GetModeName(mode)
                             </MudText>
 
-                            <MudText Typo="Typo.body2" Class="mud-text-secondary flex-grow-1 d-flex align-center">
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary grow d-flex align-center">
                                 @GetModeDescription(mode)
                             </MudText>
 

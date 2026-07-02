@@ -14,7 +14,7 @@ public sealed partial class FanPanel : ComponentBase
     [Inject] NexusBackendClient BackendClient { get; set; } = default!;
 
     [Parameter] public SystemStats? CurrentStats { get; set; }
-    [Parameter] public required IReadOnlyList<FanMode> SupportedModes { get; set; }
+    [Parameter] public IReadOnlyList<FanMode> SupportedModes { get; set; } = [];
 
     public int CurrentCpuTemp => CurrentStats?.CpuTemp ?? 0;
     public int CurrentGpuTemp => CurrentStats?.GpuTemp ?? 0;
