@@ -187,7 +187,7 @@
     <value>Servisle iletişim kurulurken bir G/Ç hatası meydana geldi.</value>
   </data>
   <data name="MuxDescHybrid" xml:space="preserve">
-    <value>Dahili grafik birimi tamamen devre dışı bırakılır. Kare iletim gecikmesini en aza indirerek oyunlarda maksimum performans sağlar, ancak pil tüketimini artırır.</value>
+    <value>Dahili ve harici grafik işlemciler yük durumuna göre dinamik olarak otomatik değiştirilir. Günlük kullanımda güç tasarrufu, yük altında performans sağlar.</value>
   </data>
   <data name="MuxDescDiscrete" xml:space="preserve">
     <value>Dahili grafik birimi tamamen devre dışı bırakılır. Kare iletim gecikmesini en aza indirerek oyunlarda maksimum performans sağlar, ancak pil tüketimini artırır.</value>
@@ -242,5 +242,8 @@
   </data>
   <data name="ExampleTemp" xml:space="preserve">
     <value>örn. 60</value>
+  </data>
+  <data name="PointSettings" xml:space="preserve">
+    <value>Nokta Ayarları</value>
   </data>
 </root>

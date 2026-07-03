@@ -250,7 +250,7 @@ namespace Nexus.Client.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Integrated (iGPU) and discrete (dGPU) graphics dynamically switch based on load. Provides power saving for daily use and performance under load..
+        ///   Looks up a localized string similar to Integrated and discrete graphics dynamically switch based on load. Provides power saving for daily use and performance under load..
         /// </summary>
         public static string MuxDescHybrid {
             get {
@@ -367,6 +367,15 @@ namespace Nexus.Client.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Point Settings.
+        /// </summary>
+        public static string PointSettings {
+            get {
+                return ResourceManager.GetString("PointSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} Point Settings.
         /// </summary>
         public static string PointSettingsTitleFormat {
@@ -403,7 +412,7 @@ namespace Nexus.Client.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Service not found! Please ensure the Nexus Hardware Service is running in the background..
+        ///   Looks up a localized string similar to Service not found! Please ensure the Nexus Background Service is running in the background..
         /// </summary>
         public static string ServiceNotFoundWarning {
             get {

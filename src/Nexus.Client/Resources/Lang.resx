@@ -210,7 +210,7 @@
     <comment>MuxPanel.razor.cs</comment>
   </data>
   <data name="MuxDescHybrid" xml:space="preserve">
-    <value>Integrated (iGPU) and discrete (dGPU) graphics dynamically switch based on load. Provides power saving for daily use and performance under load.</value>
+    <value>Integrated and discrete graphics dynamically switch based on load. Provides power saving for daily use and performance under load.</value>
     <comment>MuxPanel.razor.cs</comment>
   </data>
   <data name="MuxDescDiscrete" xml:space="preserve">
@@ -284,5 +284,9 @@
   <data name="ExampleTemp" xml:space="preserve">
     <value>e.g. 60</value>
     <comment>PointEditorDialog.razor</comment>
+  </data>
+  <data name="PointSettings" xml:space="preserve">
+    <value>Point Settings</value>
+    <comment>CurveEditor.razor</comment>
   </data>
 </root>

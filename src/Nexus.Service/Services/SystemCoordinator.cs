@@ -66,7 +66,7 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
                 (false, true) => [FanMode.Auto, FanMode.Max],
                 (false, false) => [FanMode.Auto]
             };
-            
+
             await _fanController.InitializeAsync(isManualFanSupported, isMaxFanSupported).ConfigureAwait(false);
             await _muxController.InitializeAsync().ConfigureAwait(false);
 
@@ -80,6 +80,19 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
                 LogNvidiaNotFound(_logger);
 
             await TryConnectCoreTempAsync(cancellationToken).ConfigureAwait(false);
+
+            var initialMode = _currentConfig.LastMode;
+
+            if (initialMode == FanMode.Manual && !_isCoreTempConnected)
+            {
+                LogCoreTempMissingFallback(_logger);
+                initialMode = FanMode.Auto;
+            }
+
+            if (!_supportedFanModes.Contains(initialMode))
+                initialMode = FanMode.Auto;
+
+            await _fanController.SetFanModeAsync(initialMode).ConfigureAwait(false);
 
             _isInitialized = true;
         }
@@ -185,5 +198,8 @@ internal sealed partial class SystemCoordinator : ISystemCoordinator, IDisposabl
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "WDDM: NVIDIA card not found in the system. Fallback ACPI data will be used.")]
     private static partial void LogNvidiaNotFound(ILogger logger);
+    
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "CoreTemp connection failed. Falling back to Auto mode instead of Manual to prevent overheating.")]
+    private static partial void LogCoreTempMissingFallback(ILogger logger);
     #endregion
 }
